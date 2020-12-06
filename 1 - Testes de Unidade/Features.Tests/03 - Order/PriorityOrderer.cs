@@ -7,6 +7,8 @@ using Xunit.Sdk;
 namespace Features.Tests
 {
   /* Essas classes são da xunit. Elas que se encarregam de ordenar os métodos, baseando-se pelas prioridades que foram definidas pelo usuário, através dos atributos nos métodos de testes.
+   * 
+   * Existem mais "samples" no github do xunit, por exemplo, ordenar (priorizar) por ordem alfabética os métodos.
    */
 
   [AttributeUsage(AttributeTargets.Method)]
