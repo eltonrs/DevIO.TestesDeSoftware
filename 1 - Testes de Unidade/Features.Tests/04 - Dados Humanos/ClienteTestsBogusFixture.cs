@@ -37,6 +37,15 @@ namespace Features.Tests
       //var clientefaker = new Faker<Cliente>();
       //clientefaker.RuleFor(c => c.Nome, (f, c) => f.Name.FirstName());
 
+      //var clienteFaker = new Faker<Cliente>("pt-BR")
+      //  .RuleFor(c => c.Nome, (f, c) => f.Name.FirstName())
+      //  .RuleFor(c => c.Sobrenome, (f, c) => f.Name.LastName());
+      
+      /* Lento:
+       * "pt_BR" como parametro, indica a cultura que quero utilizar para gerar os dados fakes;
+       * "CustomInstantiator": vou utilizar o constructor da minha classe, onde:
+       *   o "f" (faker) vai para meu objeto "Cliente"
+       */
       var clientes = new Faker<Cliente>("pt_BR")
           .CustomInstantiator(f => new Cliente(
               Guid.NewGuid(),
