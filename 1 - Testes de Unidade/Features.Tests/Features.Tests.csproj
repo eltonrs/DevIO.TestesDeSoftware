@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="06 - AutoMock\" />
     <Folder Include="07 - FluentAssertions\" />
   </ItemGroup>
 
