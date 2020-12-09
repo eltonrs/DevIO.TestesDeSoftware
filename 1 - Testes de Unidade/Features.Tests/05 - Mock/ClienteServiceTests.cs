@@ -3,6 +3,7 @@ using MediatR;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Xunit;
@@ -60,6 +61,8 @@ namespace Features.Tests
        *    No caso do Publish, é mais complexo:
        *      1 - Ele passa um objeto do tipo ClienteEmailNotification, porém essa classe herda da INotification. Por isso é utilizado o "IsAny<tipo/interface>"
        *      2 - Ele passa outro parâmetro, no caso default (por isso não tem lá na ClienteService), mas nesse caso deve ser passado (aqui é analisar caso a caso).
+       * 
+       * Detalhe: os métodos "Adicionar" e "Publish" retornam void.
        */
       clienteRepo.Verify(r => r.Adicionar(cliente), Times.Once);
       mediator.Verify(m => m.Publish(It.IsAny<INotification>(), CancellationToken.None), Times.Once);
@@ -69,14 +72,52 @@ namespace Features.Tests
     [Trait("Mokando", "Cliente Service Mock Tests")]
     public void ClienteService_Adicionar_DeveFalharDevidoClienteInvalido()
     {
+      // Arrange
+      var cliente = _clienteTestsBogusFixture.GerarClienteInvalido();
+      var clienteRepo = new Mock<IClienteRepository>();
+      var mediator = new Mock<IMediator>();
+      
+      var clienteService = new ClienteService(clienteRepo.Object, mediator.Object);
 
+      // Act
+      clienteService.Adicionar(cliente);
+
+      // Assert
+      clienteRepo.Verify(r => r.Adicionar(cliente), Times.Never);
+      mediator.Verify(m => m.Publish(It.IsAny<INotification>(), CancellationToken.None), Times.Never);
     }
 
     [Fact(DisplayName = "Obter Clientes Ativos")]
     [Trait("Mokando", "Cliente Service Mock Tests")]
-    public void ClienteService_Obter_()
+    public void ClienteService_ObterTodosAtivos_DeveRetornarApenasClientesAtivos()
     {
+      // Arrange
+      var clienteRepo = new Mock<IClienteRepository>();
+      /* lendo: o Setup do Mock, é "ensinar" o método a fazer o que eu quero...
+       * 
+       * Quando o método "ObterTodos" for chamado, o retorno deve ser "_clienteTestsBogusFixture.ObterClientesVariados()".
+       * 
+       * Esquema é: Setup(... método).Returns(método que retornar o que vc quer);
+       */
+      clienteRepo.Setup(c => c.ObterTodos())
+        .Returns(_clienteTestsBogusFixture.ObterClientesVariados());
 
+      var mediator = new Mock<IMediator>();
+      var clienteService = new ClienteService(clienteRepo.Object, mediator.Object);
+
+      // Act
+      /* Lendo:
+       * Ao invocar o método "ObterTodosAtivos", os objetos utilizam instâncias do Mock, então não tem dados. Será necessario uma configuração inicial, que é a seguinte:
+       * No Cliente Fixture, implementar um método que retorne uma lista de clientes, simples assim.
+       */
+      
+      var clientes = clienteService.ObterTodosAtivos(); // que vai internamente chama o método "ObterTodos" do repositório
+
+      // Assert
+      clienteRepo.Verify(r => r.ObterTodos(), Times.Once); // Não precisaria
+      // o teste de fato é valdiar o resultado (clientes)
+      Assert.True(clientes.Any());
+      Assert.False(clientes.Count(c => !c.Ativo) > 0);
     }
   }
 }
