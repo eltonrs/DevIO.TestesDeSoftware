@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Collections.ObjectModel;
+using NerdStore.Core.DomainObjects;
 
 namespace NerdStore.Vendas.Domain
 {
@@ -13,6 +14,17 @@ namespace NerdStore.Vendas.Domain
     Pago = 4,
     Entregue = 5,
     Cancelado = 6
+  }
+
+  public static class PedidoConstantes
+  {
+    public static int MAX_UNIDADES_ITEM => 15; // "=> 15" = "{ get { return 15; } }" é uma expressão lambda
+    public static int MIN_UNIDADES_ITEM
+    {
+      get { return 1; }
+    }
+
+    //public const int MAX_UNIDADES_ITEM = 15; // poderia ser assim também.
   }
 
   public class Pedido
@@ -28,9 +40,30 @@ namespace NerdStore.Vendas.Domain
       _pedidoItems = new List<PedidoItem>();
     }
 
+    private bool PedidoItemExistente(PedidoItem pedidoItem)
+    {
+      return _pedidoItems.Any(pi => pi.ProdutoId == pedidoItem.ProdutoId);
+    }
+
+    private void ValidarQuantidadeMaximaUnidadeItemPedido(PedidoItem pedidoItem)
+    {
+      int quantidadeTotal = pedidoItem.Quantidade;
+      
+      if (PedidoItemExistente(pedidoItem))
+      {
+        var pedidoItemExistente = _pedidoItems.FirstOrDefault(pi => pi.ProdutoId == pedidoItem.ProdutoId);
+        quantidadeTotal += pedidoItemExistente.Quantidade;
+      }
+
+      if (quantidadeTotal > PedidoConstantes.MAX_UNIDADES_ITEM)
+        throw new DomainException($"Excedeu o número itens por produto no pedido. O máximo são {PedidoConstantes.MAX_UNIDADES_ITEM} itens.");
+    }
+
     public void AdicionarItem(PedidoItem pedidoItem)
     {
-      if (_pedidoItems.Any(pi => pi.ProdutoId == pedidoItem.ProdutoId))
+      ValidarQuantidadeMaximaUnidadeItemPedido(pedidoItem);
+      
+      if (PedidoItemExistente(pedidoItem))
       {
         var pedidoItemExistente = _pedidoItems.FirstOrDefault(pi => pi.ProdutoId == pedidoItem.ProdutoId);
         pedidoItemExistente.AdicionarUnidades(pedidoItem.Quantidade);
@@ -44,7 +77,7 @@ namespace NerdStore.Vendas.Domain
       CalcularValorPedido();
     }
 
-    public void CalcularValorPedido()
+    private void CalcularValorPedido()
     {
       ValorTotal = _pedidoItems.Sum(i => i.CalcularValor());
     }

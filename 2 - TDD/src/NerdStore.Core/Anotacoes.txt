@@ -1,0 +1,1 @@
+﻿Esse projeto seria o SharedKernel (DDD);

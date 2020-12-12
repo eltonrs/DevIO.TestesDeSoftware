@@ -1,0 +1,1 @@
+﻿A classe "Pedido" é a raiz da agregação (DDD);
