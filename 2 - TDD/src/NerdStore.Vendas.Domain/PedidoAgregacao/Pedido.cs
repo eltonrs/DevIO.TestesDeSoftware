@@ -29,7 +29,7 @@ namespace NerdStore.Vendas.Domain.PedidoAgregacao
     //public const int MAX_UNIDADES_ITEM = 15; // poderia ser assim também.
   }
 
-  public class Pedido : Entidade
+  public class Pedido : Entidade, IAggregateRoot
   {
     public Guid ClienteId { get; set; }
     public decimal ValorTotal { get; private set; }
@@ -45,7 +45,7 @@ namespace NerdStore.Vendas.Domain.PedidoAgregacao
       _pedidoItems = new List<PedidoItem>();
     }
 
-    private bool PedidoItemExistente(PedidoItem pedidoItem)
+    public bool PedidoItemExistente(PedidoItem pedidoItem)
     {
       return _pedidoItems.Any(pi => pi.ProdutoId == pedidoItem.ProdutoId);
     }
