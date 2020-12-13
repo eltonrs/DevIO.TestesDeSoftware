@@ -1,1 +1,3 @@
 ﻿Esse projeto seria o SharedKernel (DDD);
+
+No Core, ficam os commands e os events (do CQRS), e geralmente são entendidos como mensagens (por isso a pasta Messages).

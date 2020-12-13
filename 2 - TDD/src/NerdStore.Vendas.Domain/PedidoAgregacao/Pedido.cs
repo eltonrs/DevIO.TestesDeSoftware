@@ -29,7 +29,7 @@ namespace NerdStore.Vendas.Domain.PedidoAgregacao
     //public const int MAX_UNIDADES_ITEM = 15; // poderia ser assim também.
   }
 
-  public class Pedido
+  public class Pedido : Entidade
   {
     public Guid ClienteId { get; set; }
     public decimal ValorTotal { get; private set; }

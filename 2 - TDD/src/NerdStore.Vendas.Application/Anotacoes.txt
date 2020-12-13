@@ -1,0 +1,1 @@
+﻿Commands, Events e Queries : estrutura do CQRS.
