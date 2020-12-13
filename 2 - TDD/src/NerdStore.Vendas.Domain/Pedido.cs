@@ -4,6 +4,8 @@ using System.Text;
 using System.Linq;
 using System.Collections.ObjectModel;
 using NerdStore.Core.DomainObjects;
+using FluentValidation.Results;
+using NerdStore.Vendas.Domain.VoucherAgregacao;
 
 namespace NerdStore.Vendas.Domain
 {
@@ -31,6 +33,9 @@ namespace NerdStore.Vendas.Domain
   {
     public Guid ClienteId { get; set; }
     public decimal ValorTotal { get; private set; }
+    public bool VoucherUtilizado { get; private set; }
+    public decimal? ValorDesconto { get; private set; }
+    public Voucher Voucher { get; set; }
     public PedidoStatus PedidoStatus { get; set; }
     private readonly List<PedidoItem> _pedidoItems;
     public IReadOnlyCollection<PedidoItem> PedidoItens => _pedidoItems;
@@ -104,11 +109,56 @@ namespace NerdStore.Vendas.Domain
     private void CalcularValorPedido()
     {
       ValorTotal = _pedidoItems.Sum(i => i.CalcularValor());
+      CalcularValorTotalDesconto();
     }
 
     public void TornarRascunho()
     {
       PedidoStatus = PedidoStatus.Rascunho;
+    }
+
+    public ValidationResult AplicarVoucher(Voucher voucher)
+    {
+      var result = voucher.ValidarSeAplicavel();
+      
+      if (result.IsValid)
+      {
+        Voucher = voucher;
+        VoucherUtilizado = true;
+
+        CalcularValorTotalDesconto();
+      }
+
+      return result; // melhor retornar o ValidationResult do que só um bool, pq lá tem todas as msgs de erro para serem utilizadas nos testes.
+    }
+
+    public void CalcularValorTotalDesconto()
+    {
+      if (!VoucherUtilizado)
+        return;
+
+      decimal desconto = 0;
+      var valorTotal = ValorTotal;
+
+      if (Voucher.TipoDescontoVoucher == TipoDescontoVoucher.Valor)
+      {
+        if (Voucher.ValorDesconto.HasValue)
+        {
+          desconto = Voucher.ValorDesconto.Value; // ".Value" pq Voucher.ValorDesconto é nullable e Pedido.ValorTotal não é... então pego o Value dele.
+        }
+      }
+      else
+      {
+        if (Voucher.PercentualDesconto.HasValue)
+        {
+          desconto = (ValorTotal * Voucher.PercentualDesconto.Value) / 100;
+        }
+      }
+
+      valorTotal -= desconto;
+
+      ValorDesconto = desconto;
+      ValorTotal = valorTotal < 0 ? 0 : valorTotal;
     }
 
     public static class PedidoFactory // Classe aninhada (dentro de outra classe)
