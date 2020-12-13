@@ -7,7 +7,7 @@ using NerdStore.Core.DomainObjects;
 using FluentValidation.Results;
 using NerdStore.Vendas.Domain.VoucherAgregacao;
 
-namespace NerdStore.Vendas.Domain
+namespace NerdStore.Vendas.Domain.PedidoAgregacao
 {
   public enum PedidoStatus
   {

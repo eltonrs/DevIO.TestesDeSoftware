@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NerdStore.Core.DomainObjects;
 
-namespace NerdStore.Vendas.Domain
+namespace NerdStore.Vendas.Domain.PedidoAgregacao
 {
   public class PedidoItem
   {

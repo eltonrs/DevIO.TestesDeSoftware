@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
-using NerdStore.Vendas.Domain;
+using NerdStore.Vendas.Domain.PedidoAgregacao;
 using System.Linq;
 using NerdStore.Core.DomainObjects;
 using NerdStore.Vendas.Domain.VoucherAgregacao;

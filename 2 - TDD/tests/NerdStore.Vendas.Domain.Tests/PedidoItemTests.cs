@@ -1,6 +1,7 @@
 ﻿using System;
 using Xunit;
 using NerdStore.Core.DomainObjects;
+using NerdStore.Vendas.Domain.PedidoAgregacao;
 
 namespace NerdStore.Vendas.Domain.Tests
 {
